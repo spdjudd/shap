@@ -530,22 +530,25 @@ class TreeEnsemble:
             self.objective = objective_name_map.get(model.criterion, None)
         elif str(type(model)).endswith("sklearn.ensemble.bagging.BaggingRegressor'>"):
             if str(type(model.base_estimator)).endswith("sklearn.tree.tree.DecisionTreeRegressor'>"):
+                self.internal_dtype = model.estimators_[0].tree_.value.dtype.type
                 self.dtype = np.float32
                 scaling = 1.0 / len(model.estimators_) # output is average of trees
                 self.trees = [Tree(e.tree_, scaling=scaling, data=data, data_missing=data_missing) for e in model.estimators_]
                 self.objective = objective_name_map.get(model.base_estimator.criterion, None)
                 self.tree_output = "raw_value"
             else:
-                raise Exception("BaggingRegressor with this base_estimator not yet supported by TreeExplainer: " + str(type(model.base_estimator)))
+                raise Exception("BaggingRegressor with this base_estimator not supported: " + str(type(model.base_estimator)))
         elif str(type(model)).endswith("sklearn.ensemble.bagging.BaggingClassifier'>"):
             if str(type(model.base_estimator)).endswith("sklearn.tree.tree.DecisionTreeClassifier'>"):
+                self.internal_dtype = model.estimators_[0].tree_.value.dtype.type
                 self.dtype = np.float32
                 scaling = 1.0 / len(model.estimators_) # output is average of trees
-                self.trees = [Tree(e.tree_, normalize=True, scaling=scaling, data=data, data_missing=data_missing) for e in model.estimators_]
+                self.trees = [
+                    Tree(e.tree_, normalize=True, scaling=scaling, data=data, data_missing=data_missing) for e in model.estimators_]
                 self.objective = objective_name_map.get(model.base_estimator.criterion, None)
                 self.tree_output = "probability"
             else:
-                raise Exception("BaggingClassifier with this base_estimator not yet supported by TreeExplainer: " + str(type(model.base_estimator)))
+                raise Exception("BaggingClassifier with this base_estimator not supported: " + str(type(model.base_estimator)))
         elif str(type(model)).endswith("pyspark.ml.classification.RandomForestClassificationModel'>") \
                 or str(type(model)).endswith("pyspark.ml.classification.GBTClassificationModel'>"):
             assert_import("pyspark")
