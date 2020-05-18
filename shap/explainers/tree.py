@@ -528,8 +528,8 @@ class TreeEnsemble:
 
             self.trees = [Tree(e.tree_, scaling=model.learning_rate, data=data, data_missing=data_missing) for e in model.estimators_[:,0]]
             self.objective = objective_name_map.get(model.criterion, None)
-        elif str(type(model)).endswith("sklearn.ensemble.bagging.BaggingRegressor'>"):
-            if str(type(model.base_estimator)).endswith("sklearn.tree.tree.DecisionTreeRegressor'>"):
+        elif str(type(model)).endswith("sklearn.ensemble._bagging.BaggingRegressor'>"):
+            if str(type(model.base_estimator)).endswith("sklearn.tree._classes.DecisionTreeRegressor'>"):
                 self.internal_dtype = model.estimators_[0].tree_.value.dtype.type
                 self.dtype = np.float32
                 scaling = 1.0 / len(model.estimators_) # output is average of trees
@@ -538,8 +538,8 @@ class TreeEnsemble:
                 self.tree_output = "raw_value"
             else:
                 raise Exception("BaggingRegressor with this base_estimator not supported: " + str(type(model.base_estimator)))
-        elif str(type(model)).endswith("sklearn.ensemble.bagging.BaggingClassifier'>"):
-            if str(type(model.base_estimator)).endswith("sklearn.tree.tree.DecisionTreeClassifier'>"):
+        elif str(type(model)).endswith("sklearn.ensemble._bagging.BaggingClassifier'>"):
+            if str(type(model.base_estimator)).endswith("sklearn.tree._classes.DecisionTreeClassifier'>"):
                 self.internal_dtype = model.estimators_[0].tree_.value.dtype.type
                 self.dtype = np.float32
                 scaling = 1.0 / len(model.estimators_) # output is average of trees
